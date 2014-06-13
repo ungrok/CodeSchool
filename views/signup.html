@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ajax POST</title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="/static/main.js"></script>
+      
+    
+  </head>
+  <body>
+    <h1>Create a Skill</h1>
+    <form id="the-form" method="post">
+      % if skill:
+      <div>
+	<input type="hidden" name="id" value="{{ skill.id }}">	
+        <input type="text" placeholder="Title" value="{{ skill.title }}" name="title">
+      </div>
+      <div>
+        <input type="text" placeholder="Description" value="{{ skill.description }}" name="description">
+      </div>
+      <div>
+        <input type="text" placeholder="Image Url" value="{{ skill.image_path }}" name="image_path">
+      </div>
+      % else:
+      <div>
+        <input type="text" placeholder="Title" name="title">
+      </div>
+      <div>
+        <input type="text" placeholder="Description" name="description">
+      </div>
+      <div>
+        <input type="text" placeholder="Image Url" name="image_path">
+      </div>
+      % end
+      <div>
+	<p>This will show up for everyone. Are you okay with that?</p>
+        <label for="accept-checkbox">Accept!:</label>
+        <input type="checkbox" name="accept" id="accept-checkbox">
+      </div>
+      <div>
+        <input type="submit" value="Sign Up!">
+      </div>
+    </form>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

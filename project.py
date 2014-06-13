@@ -1,15 +1,21 @@
+import os
 
 import bottle
 from bottle.ext import sqlite
-from bottle import HTTPError, response, request
+from bottle import HTTPError, response, request, view, static_file
 from json import dumps
 import macaron
+
+
+BASE_DIR = "/Users/codeschool/Desktop/CodeSchool/static/"
+
 
 app = bottle.Bottle()
 plugin = sqlite.Plugin(dbfile='database.db')
 app.install(plugin)
 
 app.install(macaron.MacaronPlugin("database.db"))
+
 
 class Skills(macaron.Model):
     title = macaron.CharField()
@@ -22,6 +28,51 @@ class Challenges(macaron.Model):
     description = macaron.CharField()
     image_url = macaron.CharField()
     skill = macaron.ManyToOne(Skills, related_name="skill")
+
+
+@app.post("/signup")
+def signup_form():
+    id = int(request.params.get("id", 0))
+    title = request.params.get("title", "")
+    description = request.params.get("description", "")
+    image_path = request.params.get("image_path", "")
+    url = "/%s" % title.lower()
+    title = title.title()
+
+
+    if id > 0:
+        skill = Skills.get(id)
+        skill.title = title
+        skill.description = description
+        skill.image_path = image_path
+        skill.save()
+    else:
+        skill = Skills.create(
+            title=title,
+            description=description,
+            image_path=image_path,
+            url=url)
+
+    return {"skill": skill.dict}
+
+
+@app.get('/signup')
+@app.get('/signup/<id:int>')
+@view("signup.html")
+def signup(id=0):
+    try:
+        skill = Skills.get(id)
+        return {"skill" : skill}
+    except:
+        return {"skill" : None}
+
+@app.get("/static/<filepath:path>")
+def serve_static(filepath):
+    # find file
+    # open the file
+    
+    return static_file(filepath, root=BASE_DIR)
+
         
 def results(query):
     limit = int(request.params.get("limit", 20))
@@ -64,14 +115,6 @@ def error(ex):
 def get_all_skills(db):
     try:
         skills = Skills.all()
-        return results(skills)
-    except Exception, ex:
-        return error(ex)
-
-@app.get('/skills/<t>')
-def get_skills_by_title(t):
-    try:
-        skills = Skills.get(title=t)
         return results(skills)
     except Exception, ex:
         return error(ex)
